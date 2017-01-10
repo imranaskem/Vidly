@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 using Vidly.Models;
 using Vidly.ViewModels;
 
@@ -10,37 +11,22 @@ namespace Vidly.Controllers
 {
     public class MoviesController : Controller
     {
-        // GET: Movies
-        public ActionResult Random()
-        {
-            var movie = new Movie() { Name = "Shrek!" };
-            var customers = new List<Customer>
-            {
-                new Customer { Name = "Customer 1" },
-                new Customer { Name = "Customer 2" }
-            };
+        private ApplicationDbContext _context;
 
-            var viewModel = new RandomMovieViewModel
-            {
-                Movie = movie,
-                Customers = customers
-            };
-                        
-            return View(viewModel);
+        public MoviesController()
+        {
+            this._context = new ApplicationDbContext();
         }
 
-        public ActionResult Edit(int id)
+        protected override void Dispose(bool disposing)
         {
-            return Content("id=" + id);
+            _context.Dispose();
         }
 
+        // GET: Movies        
         public ActionResult Index()
         {
-            var movies = new List<Movie>
-            {
-                new Movie { Name = "Wall-E", Id = 1 },
-                new Movie { Name = "Shrek", Id = 2 }
-            };
+            var movies = this._context.Movies.Include(c => c.Genre).ToList();
 
             var viewModel = new MovieList
             {
@@ -52,21 +38,7 @@ namespace Vidly.Controllers
 
         public ActionResult Details(int id)
         {
-            var movies = new List<Movie>
-            {
-                new Movie { Name = "Wall-E", Id = 1 },
-                new Movie { Name = "Shrek", Id = 2 }
-            };
-
-            Movie displayedMovie = null;
-
-            foreach (var movie in movies)
-            {
-                if (movie.Id == id)
-                {
-                    displayedMovie = movie;
-                }
-            }
+            var displayedMovie = this._context.Movies.Include(g => g.Genre).SingleOrDefault(i => i.Id == id);            
 
             if (displayedMovie == null)
             {
@@ -77,6 +49,58 @@ namespace Vidly.Controllers
                 return View(displayedMovie);
             }
 
+        }
+
+        public ActionResult New()
+        {
+            var viewModel = new MovieFormViewModel
+            {
+                Genres = this._context.Genres.ToList()
+            };
+            
+            return View("MovieForm", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Save(Movie movie)
+        {
+            if (movie.Id == 0)
+            {
+                movie.DateAdded = DateTime.UtcNow;
+                this._context.Movies.Add(movie);
+            }
+            else
+            {
+                var movieInDb = this._context.Movies.Single(c => c.Id == movie.Id);
+
+                movieInDb.Name = movie.Name;
+                movieInDb.ReleaseDate = movie.ReleaseDate;
+                movieInDb.GenreId = movie.GenreId;
+                movieInDb.NumberInStock = movie.NumberInStock;
+            }
+
+            this._context.SaveChanges();
+
+            return RedirectToAction("Index", "Movies");
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var movie = this._context.Movies.Include(g => g.Genre).SingleOrDefault(i => i.Id == id);
+
+            if (movie == null)
+            {
+                return HttpNotFound("Movie with that Id does not exist");
+            }
+
+
+            var viewModel = new MovieFormViewModel
+            {
+                Movie = movie,
+                Genres = this._context.Genres.ToList()
+            };
+
+            return View("MovieForm", viewModel);
         }
 
         [Route("movies/released/{year}/{month:regex(\\d{2}):range(1, 12)}")]

@@ -3975,6 +3975,9 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   z-index: 2;
   margin-left: -1px;
 }
+.marginbtm10 {
+    margin-bottom: 10px;
+}
 .nav {
   margin-bottom: 0;
   padding-left: 0;

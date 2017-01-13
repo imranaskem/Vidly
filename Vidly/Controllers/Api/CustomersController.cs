@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Data.Entity;
 using Vidly.Models;
 using Vidly.Dtos;
 using AutoMapper;
@@ -22,7 +23,10 @@ namespace Vidly.Controllers.Api
         [HttpGet]
         public IEnumerable<CustomerDto> GetCustomers()
         {
-            return this._context.Customers.ToList().Select(Mapper.Map<Customer, CustomerDto>);
+            return this._context.Customers
+                .Include(c => c.MembershipType)
+                .ToList()
+                .Select(Mapper.Map<Customer, CustomerDto>);
         }
 
         [HttpGet]
@@ -57,37 +61,41 @@ namespace Vidly.Controllers.Api
         }
 
         [HttpPut]
-        public void UpdateCustomer(int id, CustomerDto customerDto)
+        public IHttpActionResult UpdateCustomer(int id, CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                return BadRequest();
             }
 
             var customerInDb = this._context.Customers.SingleOrDefault(i => i.Id == id);
 
             if (customerInDb == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             Mapper.Map(customerDto, customerInDb);
             
             this._context.SaveChanges();
+
+            return Ok(customerDto);
         }
 
         [HttpDelete]
-        public void DeleteCustomer(int id)
+        public IHttpActionResult DeleteCustomer(int id)
         {
             var customerInDb = this._context.Customers.SingleOrDefault(i => i.Id == id);
 
             if (customerInDb == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             this._context.Customers.Remove(customerInDb);
             this._context.SaveChanges();
+
+            return Ok();
         }
     }
 }

@@ -26,7 +26,14 @@ namespace Vidly.Controllers
         // GET: Movies        
         public ActionResult Index()
         {
-           return View();
+            if (User.IsInRole(RoleName.CanManageMovies))
+            {
+                return View("List");
+            }
+            else
+            {
+                return View("ReadOnlyList");
+            }
         }
 
         public ActionResult Details(int id)
@@ -41,9 +48,9 @@ namespace Vidly.Controllers
             {
                 return View(displayedMovie);
             }
-
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult New()
         {
             var viewModel = new MovieFormViewModel
@@ -57,6 +64,7 @@ namespace Vidly.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Save(Movie movie)
         {
             if (!ModelState.IsValid)
@@ -90,6 +98,7 @@ namespace Vidly.Controllers
             return RedirectToAction("Index", "Movies");
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Edit(int id)
         {
             var movie = this._context.Movies.Include(g => g.Genre).SingleOrDefault(i => i.Id == id);
@@ -99,7 +108,6 @@ namespace Vidly.Controllers
                 return HttpNotFound("Movie with that Id does not exist");
             }
 
-
             var viewModel = new MovieFormViewModel
             {
                 Movie = movie,
@@ -107,12 +115,6 @@ namespace Vidly.Controllers
             };
 
             return View("MovieForm", viewModel);
-        }
-
-        [Route("movies/released/{year}/{month:regex(\\d{2}):range(1, 12)}")]
-        public ActionResult ByReleaseDate(int year, int month)
-        {
-            return Content(year + "/" + month);
-        }
+        }        
     }
 }

@@ -20,6 +20,7 @@ namespace Vidly.Controllers.Api
             this._context = new ApplicationDbContext();
         }
 
+        
         [HttpGet]
         public IEnumerable<MovieDto> GetMovies()
         {
@@ -29,6 +30,7 @@ namespace Vidly.Controllers.Api
                 .Select(Mapper.Map<Movie, MovieDto>);
         }
 
+        
         [HttpGet]
         public IHttpActionResult GetMovie(int id)
         {

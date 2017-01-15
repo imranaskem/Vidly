@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Data.Entity;
 using Vidly.Models;
 using Vidly.Dtos;
+using AutoMapper;
 
 namespace Vidly.Controllers.Api
 {
@@ -16,6 +18,44 @@ namespace Vidly.Controllers.Api
         public RentalController()
         {
             this._context = new ApplicationDbContext();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            this._context.Dispose();
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetRentals()
+        {
+            var rentals = this._context.Rentals
+                .Include(r => r.Customer)
+                .Include(r => r.Movie)
+                .Where(r => r.DateReturned == null);
+
+            var rentalDtos = rentals.ToList().Select(Mapper.Map<Rental, RentalDto>);
+
+            return Ok(rentalDtos);
+        }
+
+        [HttpPost]
+        public IHttpActionResult ReturnRental(int id)
+        {
+            var rental = this._context.Rentals
+                .Include(r => r.Customer)
+                .Include(r => r.Movie)
+                .SingleOrDefault(r => r.Id == id);
+
+            if (rental == null)
+            {
+                return BadRequest("Rental not found");
+            }
+
+            rental.DateReturned = DateTime.UtcNow.Date;
+
+            this._context.SaveChanges();
+
+            return Ok();
         }
 
         [HttpPost]
@@ -38,7 +78,7 @@ namespace Vidly.Controllers.Api
                 {
                     Movie = movie,
                     Customer = customer,
-                    DateRented = DateTime.UtcNow
+                    DateRented = DateTime.UtcNow.Date
 
                 };               
 

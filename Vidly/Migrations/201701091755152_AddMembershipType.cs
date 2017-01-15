@@ -11,14 +11,14 @@ namespace Vidly.Migrations
                 "dbo.MembershipTypes",
                 c => new
                     {
-                        Id = c.Byte(nullable: false),
+                        Id = c.Int(nullable: false),
                         SignUpFee = c.Short(nullable: false),
                         DurationInMonths = c.Byte(nullable: false),
                         DiscountRate = c.Byte(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
-            AddColumn("dbo.Customers", "MembershipTypeId", c => c.Byte(nullable: false));
+            AddColumn("dbo.Customers", "MembershipTypeId", c => c.Int(nullable: false));
             CreateIndex("dbo.Customers", "MembershipTypeId");
             AddForeignKey("dbo.Customers", "MembershipTypeId", "dbo.MembershipTypes", "Id", cascadeDelete: true);
         }

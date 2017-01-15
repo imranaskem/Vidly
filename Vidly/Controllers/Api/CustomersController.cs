@@ -20,6 +20,11 @@ namespace Vidly.Controllers.Api
             this._context = new ApplicationDbContext();
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            this._context.Dispose();
+        }
+
         [HttpGet]
         public IHttpActionResult GetCustomers(string query = null)
         {

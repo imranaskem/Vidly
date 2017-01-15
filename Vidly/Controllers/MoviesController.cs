@@ -20,7 +20,7 @@ namespace Vidly.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            _context.Dispose();
+            this._context.Dispose();
         }
 
         // GET: Movies        
@@ -81,6 +81,7 @@ namespace Vidly.Controllers
             if (movie.Id == 0)
             {
                 movie.DateAdded = DateTime.UtcNow;
+                movie.NumberAvailable = movie.NumberInStock;
                 this._context.Movies.Add(movie);
             }
             else
@@ -90,7 +91,7 @@ namespace Vidly.Controllers
                 movieInDb.Name = movie.Name;
                 movieInDb.ReleaseDate = movie.ReleaseDate;
                 movieInDb.GenreId = movie.GenreId;
-                movieInDb.NumberInStock = movie.NumberInStock;
+                movieInDb.NumberInStock = movie.NumberInStock;                
             }
 
             this._context.SaveChanges();

@@ -16,7 +16,7 @@ namespace Vidly.Migrations
                         ReleaseDate = c.DateTime(nullable: false),
                         DateAdded = c.DateTime(nullable: false),
                         NumberInStock = c.Int(nullable: false),
-                        GenreId = c.Byte(nullable: false),
+                        GenreId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Genres", t => t.GenreId, cascadeDelete: true)
@@ -26,7 +26,7 @@ namespace Vidly.Migrations
                 "dbo.Genres",
                 c => new
                     {
-                        Id = c.Byte(nullable: false),
+                        Id = c.Int(nullable: false),
                         Name = c.String(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);

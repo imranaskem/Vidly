@@ -20,7 +20,11 @@ namespace Vidly.Controllers.Api
             this._context = new ApplicationDbContext();
         }
 
-        
+        protected override void Dispose(bool disposing)
+        {
+            this._context.Dispose();
+        }
+
         [HttpGet]
         public IHttpActionResult GetMovies(string query = null)
         {
@@ -51,7 +55,7 @@ namespace Vidly.Controllers.Api
 
             return Ok(Mapper.Map<Movie, MovieDto>(movie));
         }
-
+        
         [HttpPost]
         public IHttpActionResult CreateMovie(MovieDto movieDto)
         {
@@ -72,7 +76,7 @@ namespace Vidly.Controllers.Api
 
             return Created(new Uri(Request.RequestUri + "/" + movie.Id), movieDto);
         }
-
+        
         [HttpPut]
         public IHttpActionResult UpdateMovie(int id, MovieDto movieDto)
         {
@@ -94,10 +98,14 @@ namespace Vidly.Controllers.Api
 
             return Ok(movieDto);
         }
-
+                
         [HttpDelete]
         public IHttpActionResult DeleteMovie(int id)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
             var movie = this._context.Movies.SingleOrDefault(m => m.Id == id);
 
             if (movie == null)

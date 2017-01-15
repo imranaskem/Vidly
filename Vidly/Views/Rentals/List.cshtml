@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Rentals</h2>
+
+@Html.ActionLink("New Rental", "New", "Rentals", null, new { @class = "btn btn-primary marginbtm10" })
+
+<table id="rentals" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Customer</th>
+            <th>Date Rented</th>
+            <th>Return?</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section scripts
+{
+    <script src="~/Scripts/ViewScripts/RentalIndex.js"></script>
+}
+

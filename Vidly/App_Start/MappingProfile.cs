@@ -25,6 +25,8 @@ namespace Vidly.App_Start
             Mapper.CreateMap<MembershipType, MembershipTypeDto>();
 
             Mapper.CreateMap<Genre, GenreDto>();
+
+            Mapper.CreateMap<Rental, RentalDto>();
         }
     }
 }

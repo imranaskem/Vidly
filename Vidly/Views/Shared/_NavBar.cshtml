@@ -9,7 +9,8 @@
             @Html.ActionLink("Vidly", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
         </div>
         <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">                
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("New Rental", "New", "Rentals")</li>
                 <li>@Html.ActionLink("Customers", "Index", "Customers")</li>
                 <li>@Html.ActionLink("Movies", "Index", "Movies")</li>
             </ul>
